@@ -43,7 +43,11 @@
       box-shadow: 0 24px 60px rgba(0, 0, 0, 0.8);
       padding: 20px 18px 18px;
       position: relative;
-      overflow: hidden;
+
+      /* 여기 수정 ↓ */
+      max-height: 100vh;
+      overflow-y: auto;
+      overflow-x: hidden;
     }
 
     .glow {
