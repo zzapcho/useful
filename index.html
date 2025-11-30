@@ -2,24 +2,730 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <title>뇌 썩는 실험실 모음집</title>
+  <title>유용한</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet" href="style.css" />
+  <style>
+    :root {
+      --bg-main: radial-gradient(circle at 10% 0%, #343579 0, #050516 40%, #020208 100%);
+      --card-bg: rgba(10, 10, 25, 0.92);
+      --border-soft: rgba(255, 255, 255, 0.12);
+      --accent: #7f5bff;
+      --accent2: #ff6bd9;
+      --text-main: #f7f7ff;
+      --text-soft: rgba(240, 240, 255, 0.75);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg-main);
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .app-shell {
+      width: 100%;
+      max-width: 520px;
+      background: var(--card-bg);
+      border-radius: 20px;
+      border: 1px solid var(--border-soft);
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.8);
+      padding: 20px 18px 18px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .glow {
+      position: absolute;
+      inset: -40%;
+      background:
+        radial-gradient(circle at 0 0, rgba(127, 91, 255, 0.12), transparent 55%),
+        radial-gradient(circle at 100% 0, rgba(255, 107, 217, 0.12), transparent 55%);
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    .app-title {
+      font-size: 1.5rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .badge {
+      font-size: 0.7rem;
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      background: rgba(255, 255, 255, 0.06);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .app-subtitle {
+      font-size: 0.85rem;
+      color: var(--text-soft);
+      margin-bottom: 16px;
+      line-height: 1.5;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .view {
+      animation: fadeIn 0.16s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .menu-list {
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+      margin-top: 6px;
+      margin-bottom: 10px;
+    }
+
+    .menu-item {
+      display: block;
+      padding: 10px 11px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      text-decoration: none;
+      color: var(--text-main);
+      transition: transform 0.07s ease, background 0.1s ease, border-color 0.1s ease, box-shadow 0.1s ease;
+    }
+
+    .menu-item:hover,
+    .menu-item:active {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.18);
+      transform: translateY(1px);
+      box-shadow: 0 10px 26px rgba(0, 0, 0, 0.55);
+    }
+
+    .menu-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+    }
+
+    .menu-desc {
+      font-size: 0.78rem;
+      color: var(--text-soft);
+      margin-top: 2px;
+    }
+
+    .foot-note {
+      font-size: 0.72rem;
+      color: rgba(220, 220, 255, 0.6);
+      margin-top: 8px;
+      text-align: right;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.8rem;
+      color: rgba(230, 230, 255, 0.85);
+      text-decoration: none;
+      margin-bottom: 12px;
+    }
+
+    .back-link span.icon {
+      font-size: 1rem;
+      transform: translateY(-1px);
+    }
+
+    .back-link:hover {
+      text-decoration: underline;
+    }
+
+    .view-title {
+      font-size: 1.3rem;
+      font-weight: 800;
+      margin-bottom: 4px;
+      letter-spacing: -0.02em;
+    }
+
+    .view-subtitle {
+      font-size: 0.83rem;
+      color: var(--text-soft);
+      margin-bottom: 14px;
+      line-height: 1.5;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 10px 16px;
+      border-radius: 999px;
+      border: none;
+      font-size: 0.92rem;
+      font-weight: 700;
+      cursor: pointer;
+      color: #fff;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.7);
+      transition: transform 0.07s ease, box-shadow 0.1s ease, opacity 0.1s ease;
+    }
+
+    .btn:active {
+      transform: translateY(1px) scale(0.99);
+      box-shadow: 0 5px 14px rgba(0, 0, 0, 0.85);
+      opacity: 0.9;
+    }
+
+    .btn-wide {
+      width: 100%;
+      text-align: center;
+      padding-block: 14px;
+      font-size: 1.02rem;
+    }
+
+    .btn-ghost {
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--text-main);
+      box-shadow: none;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .field {
+      margin: 10px 0 6px;
+    }
+
+    label {
+      display: block;
+      font-size: 0.8rem;
+      color: var(--text-soft);
+      margin-bottom: 4px;
+    }
+
+    input[type="text"],
+    textarea {
+      width: 100%;
+      padding: 9px 11px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.24);
+      background: rgba(5, 5, 20, 0.96);
+      color: var(--text-main);
+      font-size: 0.9rem;
+    }
+
+    textarea {
+      resize: none;
+      min-height: 76px;
+      line-height: 1.4;
+    }
+
+    .box {
+      margin-top: 12px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.06);
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    .box strong {
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .small-text {
+      margin-top: 8px;
+      font-size: 0.76rem;
+      color: rgba(220, 220, 255, 0.7);
+    }
+
+    .center {
+      text-align: center;
+    }
+
+    .mono {
+      font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    }
+
+    @media (max-width: 480px) {
+      .app-shell {
+        padding-inline: 16px;
+      }
+      .app-title {
+        font-size: 1.35rem;
+      }
+    }
+  </style>
 </head>
 <body>
-  <div class="app-container">
-    <div class="app-title">🧠 뇌 썩는 실험실 모음집</div>
-    <div class="app-subtitle">폰으로 하는 쓸데없는 실험들</div>
-    <div class="menu-list">
-      <a class="menu-item" href="apps/nothing/"><div class="menu-item-title">아무것도 안 함</div></a>
-      <a class="menu-item" href="apps/nope/"><div class="menu-item-title">그거 아님</div></a>
-      <a class="menu-item" href="apps/judge/"><div class="menu-item-title">판정</div></a>
-      <a class="menu-item" href="apps/fuzzy-clock/"><div class="menu-item-title">대충 시계</div></a>
-      <a class="menu-item" href="apps/useless-counter/"><div class="menu-item-title">이거 누르는 앱</div></a>
-      <a class="menu-item" href="apps/fake-ai/"><div class="menu-item-title">아마 AI</div></a>
-      <a class="menu-item" href="apps/dont-press/"><div class="menu-item-title">누르지 마</div></a>
-      <a class="menu-item" href="apps/excuse/"><div class="menu-item-title">변명 생성기</div></a>
-    </div>
+  <div class="app-shell">
+    <div class="glow"></div>
+
+    <!-- 메인 메뉴 -->
+    <section id="view-menu" class="view">
+      <div class="app-title">
+        유용한
+        <span class="badge">useful</span>
+      </div>
+      <div class="app-subtitle">
+        쓸모있는것들 모음 zip<br />
+        <span class="mono">index.html</span> 하나만 던져도 깃헙에서 바로 돌아감.
+      </div>
+
+      <div class="menu-list">
+        <a href="#nothing" class="menu-item">
+          <div class="menu-title">1. 아무것도 안 함</div>
+          <div class="menu-desc">버튼을 눌렀는데 아무 일도 안 일어나는 경험.</div>
+        </a>
+
+        <a href="#nope" class="menu-item">
+          <div class="menu-title">2. 그거 아님</div>
+          <div class="menu-desc">네가 뭐라 하든 일단 부터 부정하고 보는 머신.</div>
+        </a>
+
+        <a href="#judge" class="menu-item">
+          <div class="menu-title">3. 판정</div>
+          <div class="menu-desc">모든 선택을 애매하게 평가해서 기분 묘하게 만들기.</div>
+        </a>
+
+        <a href="#fuzzy-clock" class="menu-item">
+          <div class="menu-title">4. 대충 시계</div>
+          <div class="menu-desc">정확한 시간 대신 인생 코멘트를 날리는 시계.</div>
+        </a>
+
+        <a href="#counter" class="menu-item">
+          <div class="menu-title">5. 이거 누르는 앱</div>
+          <div class="menu-desc">숫자는 오르는데 인생은 그대로, 저장도 안 됨.</div>
+        </a>
+
+        <a href="#fake-ai" class="menu-item">
+          <div class="menu-title">6. 아마 AI</div>
+          <div class="menu-desc">AI인 척하면서 아무 말이나 하는 가짜 조언가.</div>
+        </a>
+
+        <a href="#dont-press" class="menu-item">
+          <div class="menu-title">7. 누르지 마</div>
+          <div class="menu-desc">누르지 말라니까 더 누르고 싶은 그 버튼.</div>
+        </a>
+
+        <a href="#excuse" class="menu-item">
+          <div class="menu-title">8. 변명 생성기</div>
+          <div class="menu-desc">지금 아무것도 안 한 이유를 자동으로 만들어줌.</div>
+        </a>
+      </div>
+
+      <div class="foot-note">
+        엄
+      </div>
+    </section>
+
+    <!-- 1. 아무것도 안 함 -->
+    <section id="view-nothing" class="view hidden">
+      <a href="#" class="back-link"><span class="icon">←</span> 메뉴로 도망가기</a>
+      <div class="view-title">🕳 아무것도 안 함</div>
+      <div class="view-subtitle">
+        UX, 기능, 감동, 전부 없음.  
+        진짜로 <strong>“아무 일도 안 일어나는 경험”</strong>을 제공합니다.
+      </div>
+
+      <button class="btn" id="btn-nothing">아무것도 하기</button>
+      <div class="box" id="box-nothing">
+        아직 아무것도 안 했습니다.  
+        사실 이 상태가 인생에서 제일 평화로울지도?
+      </div>
+    </section>
+
+    <!-- 2. 그거 아님 -->
+    <section id="view-nope" class="view hidden">
+      <a href="#" class="back-link"><span class="icon">←</span> 메뉴로 도망가기</a>
+      <div class="view-title">그거 아님</div>
+      <div class="view-subtitle">
+        뭐라고 말해도 일단 부정부터 하고 보는  
+        <strong>존재 자체가 토론 방해꾼인 앱</strong>.
+      </div>
+
+      <div class="field">
+        <label for="in-nope">하고 싶은 말 / 주장</label>
+        <input id="in-nope" type="text" placeholder="예: 이번엔 진짜 열심히 할 듯" />
+      </div>
+
+      <button class="btn" id="btn-nope">확인 받기 (하지만 부정당함)</button>
+
+      <div class="box" id="box-nope">
+        아직 아무 말도 안 했는데, 그래도 그건 아닌 것 같음.
+      </div>
+    </section>
+
+    <!-- 3. 판정 -->
+    <section id="view-judge" class="view hidden">
+      <a href="#" class="back-link"><span class="icon">←</span> 메뉴로 도망가기</a>
+      <div class="view-title">⚖ 판정</div>
+      <div class="view-subtitle">
+        인생의 선택들을 <strong>절대 확실하게 말해주지 않는</strong> 애매함 전문 판정 기계.
+      </div>
+
+      <div class="field">
+        <label for="in-judge">판정받고 싶은 행동 / 선택</label>
+        <input id="in-judge" type="text" placeholder="예: 오늘 숙제 미룸" />
+      </div>
+
+      <button class="btn" id="btn-judge">판정받기</button>
+
+      <div class="box" id="box-judge">
+        아직 판정이 내려지지 않았습니다.  
+        이 순간이 가장 안전한 상태입니다.
+      </div>
+    </section>
+
+    <!-- 4. 대충 시계 -->
+    <section id="view-fuzzy-clock" class="view hidden">
+      <a href="#" class="back-link"><span class="icon">←</span> 메뉴로 도망가기</a>
+      <div class="view-title">대충 시계</div>
+      <div class="view-subtitle">
+        정확한 시각은 알려주지만,  
+        <strong>멘탈만 상하게 하는 해석</strong>을 덤으로 붙여주는 시계.
+      </div>
+
+      <button class="btn" id="btn-time">지금 시간이 어느 정도냐</button>
+
+      <div class="box" id="box-time">
+        아직 시간에 대한 압박은 시작되지 않았습니다. 아마도.
+      </div>
+
+      <div class="small-text">
+        실제 시간을 가져오지만, 해석은 매우 편파적이고 기분 나쁠 수 있음.
+      </div>
+    </section>
+
+    <!-- 5. 이거 누르는 앱 -->
+    <section id="view-counter" class="view hidden">
+      <a href="#" class="back-link"><span class="icon">←</span> 메뉴로 도망가기</a>
+      <div class="view-title">🔢 이거 누르는 앱</div>
+      <div class="view-subtitle">
+        누를수록 숫자는 늘어나지만,  
+        <strong>저장도 안 되고 아무 의미도 없는 카운터</strong>.
+      </div>
+
+      <div class="box">
+        지금까지 이 버튼을 누른 횟수: <strong id="label-count">0</strong>
+      </div>
+
+      <button class="btn btn-wide" id="btn-count">이거 누르기</button>
+
+      <div class="small-text">
+        새로고침하면 숫자는 깨끗하게 사라집니다.  
+        노력보다 브라우저 캐시가 강한 시대.
+      </div>
+    </section>
+
+    <!-- 6. 아마 AI -->
+    <section id="view-fake-ai" class="view hidden">
+      <a href="#" class="back-link"><span class="icon">←</span> 메뉴로 도망가기</a>
+      <div class="view-title">아마 AI</div>
+      <div class="view-subtitle">
+        진지한 AI 답변을 기대했다면 잘못 찾아왔고,  
+        <strong>애매한 말만 램덤으로 뱉는 가짜 상담사</strong>.
+      </div>
+
+      <div class="field">
+        <label for="in-fake">고민 / 질문 / 그냥 아무 말</label>
+        <textarea id="in-fake" placeholder="예: 내일부터 진짜 공부할까 말까 고민됨"></textarea>
+      </div>
+
+      <button class="btn" id="btn-fake">아마 대답 듣기</button>
+
+      <div class="box" id="box-fake">
+        아직 아무 말도 안 했지만,  
+        이미 답은 마음속에 있을지도 모릅니다. 아마도.
+      </div>
+    </section>
+
+    <!-- 7. 누르지 마 -->
+    <section id="view-dont-press" class="view hidden">
+      <a href="#" class="back-link"><span class="icon">←</span> 메뉴로 도망가기</a>
+      <div class="view-title">누르지 마</div>
+      <div class="view-subtitle">
+        인간이 얼마나 <strong>“하지 말라면 더 하는 존재”</strong>인지 보는 심리 실험 버튼.
+      </div>
+
+      <button class="btn btn-wide" id="btn-dont">누르지 마</button>
+
+      <div class="box" id="box-dont">
+        아직은 안 눌렀네. 이 정도면 참을성 있는 편.
+      </div>
+
+      <div class="small-text">
+        여러 번 누르면 이 앱이 널 포기하기 시작합니다.
+      </div>
+    </section>
+
+    <!-- 8. 변명 생성기 -->
+    <section id="view-excuse" class="view hidden">
+      <a href="#" class="back-link"><span class="icon">←</span> 메뉴로 도망가기</a>
+      <div class="view-title">변명 생성기</div>
+      <div class="view-subtitle">
+        지금 아무것도 안 한 이유를  
+        <strong>그럴듯하지만 전혀 생산적이지 않게 포장</strong>해드립니다.
+      </div>
+
+      <button class="btn" id="btn-excuse">변명 생성하기</button>
+
+      <div class="box" id="box-excuse">
+        아직은 변명할 필요도 없이 그냥 안 하고 있는 상태입니다.
+      </div>
+
+      <div class="small-text">
+        선생님/부모님에게 실제로 쓰진 말고,  
+        <span class="mono">“아 나 진짜 이럴 줄 알았다”</span> 하면서 보기만 하자.
+      </div>
+    </section>
   </div>
+
+  <script>
+    // ====== 뷰 전환 (해시 기반 미니 라우터) ======
+    const viewMap = {
+      "": "view-menu",
+      "#": "view-menu",
+      "#nothing": "view-nothing",
+      "#nope": "view-nope",
+      "#judge": "view-judge",
+      "#fuzzy-clock": "view-fuzzy-clock",
+      "#counter": "view-counter",
+      "#fake-ai": "view-fake-ai",
+      "#dont-press": "view-dont-press",
+      "#excuse": "view-excuse"
+    };
+
+    function showView(hash) {
+      const id = viewMap[hash] || "view-menu";
+      document.querySelectorAll(".view").forEach(v => v.classList.add("hidden"));
+      const target = document.getElementById(id);
+      if (target) target.classList.remove("hidden");
+      // 스크롤 위로
+      window.scrollTo({ top: 0, behavior: "instant" });
+    }
+
+    window.addEventListener("hashchange", () => showView(location.hash));
+    window.addEventListener("load", () => showView(location.hash));
+
+    // ====== 각 병맛 앱 로직 ======
+
+    // 1) 아무것도 안 함
+    (function initNothing() {
+      const btn = document.getElementById("btn-nothing");
+      const box = document.getElementById("box-nothing");
+      if (!btn || !box) return;
+
+      btn.addEventListener("click", () => {
+        box.textContent = "로딩 중... (아무 일도)";
+        setTimeout(() => {
+          box.textContent = "완료: 정말 아무 일도 일어나지 않았습니다. 기대한 네 잘못임.";
+        }, 1500);
+      });
+    })();
+
+    // 2) 그거 아님
+    (function initNope() {
+      const input = document.getElementById("in-nope");
+      const btn = document.getElementById("btn-nope");
+      const box = document.getElementById("box-nope");
+      if (!input || !btn || !box) return;
+
+      const replies = [
+        "그건 아닌 듯.",
+        "전혀 아님.",
+        "아니, 그냥 아님.",
+        "뭔가 멋있게 말했지만 아님.",
+        "그렇게 믿고 싶겠지… 하지만 아님.",
+        "아니라고 3번 말하고 싶을 정도로 아님.",
+        "그건 다른 평행우주에서는 맞을 수도 있겠네."
+      ];
+
+      btn.addEventListener("click", () => {
+        const t = input.value.trim();
+        const base = t ? `"${t}" 라고 했지만,` : "말도 안 했는데도,";
+        const reply = replies[Math.floor(Math.random() * replies.length)];
+        box.textContent = base + " " + reply;
+      });
+    })();
+
+    // 3) 판정
+    (function initJudge() {
+      const input = document.getElementById("in-judge");
+      const btn = document.getElementById("btn-judge");
+      const box = document.getElementById("box-judge");
+      if (!input || !btn || !box) return;
+
+      const judgments = [
+        "굳이 그렇게까지 안 해도 됐을 것 같음.",
+        "생각보다 나쁘진 않은데, 그렇다고 좋진 않음.",
+        "애매하게 괜찮았던 선택.",
+        "지나고 나면 어차피 다 잊혀질 선택.",
+        "지금 기준으로는 미묘하지만, 나중에 추억거리는 될 수도.",
+        "본인은 진지했겠지만, 우주 입장에서는 노 코멘트.",
+        "완전 최악은 아니었음. 이게 칭찬이라면 칭찬."
+      ];
+
+      btn.addEventListener("click", () => {
+        const action = input.value.trim() || "방금 이 앱을 연 행동";
+        const j = judgments[Math.floor(Math.random() * judgments.length)];
+        box.textContent = `"${action}" 에 대한 판정: ${j}`;
+      });
+    })();
+
+    // 4) 대충 시계
+    (function initFuzzyClock() {
+      const btn = document.getElementById("btn-time");
+      const box = document.getElementById("box-time");
+      if (!btn || !box) return;
+
+      function getFuzzyLabel(date) {
+        const h = date.getHours();
+        const m = date.getMinutes();
+        const timeStr =
+          String(h).padStart(2, "0") + ":" + String(m).padStart(2, "0");
+
+        let mood = "";
+        if (h < 6) {
+          mood = "사람이 깨어있을 시간이 아님. 이 시간에 깨어있는 건 대체로 고민 때문.";
+        } else if (h < 9) {
+          mood = "일어나긴 했는데 정신은 아직 이불 속에 있음.";
+        } else if (h < 12) {
+          mood = "생각보다 시간이 많이 갔는데, 한 게 기억 안 나는 구간.";
+        } else if (h < 15) {
+          mood = "점심 먹고 멍 때리기 딱 좋은 시간대.";
+        } else if (h < 18) {
+          mood = "오늘 뭘 할 수 있을지 고민하다가 아무것도 안 하게 되는 시간.";
+        } else if (h < 22) {
+          mood = "아직 뭔가 할 수 있을 것 같은데, 사실상 이미 내일로 미루는 중.";
+        } else {
+          mood = "오늘은 그냥 이렇게 마무리하고 내일의 나에게 떠넘기는 시간.";
+        }
+
+        return `지금 시각은 대충 ${timeStr} 정도고, 느낌은 “${mood}” 입니다.`;
+      }
+
+      btn.addEventListener("click", () => {
+        const now = new Date();
+        box.textContent = getFuzzyLabel(now);
+      });
+    })();
+
+    // 5) 이거 누르는 앱
+    (function initCounter() {
+      const btn = document.getElementById("btn-count");
+      const label = document.getElementById("label-count");
+      if (!btn || !label) return;
+
+      let count = 0;
+
+      btn.addEventListener("click", () => {
+        count++;
+        label.textContent = count;
+      });
+    })();
+
+    // 6) 아마 AI
+    (function initFakeAI() {
+      const textarea = document.getElementById("in-fake");
+      const btn = document.getElementById("btn-fake");
+      const box = document.getElementById("box-fake");
+      if (!textarea || !btn || !box) return;
+
+      const answers = [
+        "그럴 수도 있고 아닐 수도 있습니다.",
+        "상황에 따라 다릅니다. 아주 많이요.",
+        "이미 마음속으로 정해놓고 확인만 받으려는 것 같네요.",
+        "지금은 아니지만, 언젠가는 그럴 수도 있을 것 같습니다. 아마요.",
+        "한 번쯤은 해볼 만하지만, 안 해도 큰일 나진 않을 듯.",
+        "개인차가 심해서 단정 짓기 어렵습니다. 이 말은 만능 카드임.",
+        "중요한 건 뭘 선택하느냐보다, 선택했다는 사실에 의미를 부여하는 일입니다. 라고 말하면 좀 있어 보임."
+      ];
+
+      btn.addEventListener("click", () => {
+        const text = textarea.value.trim();
+        const prefix = text ? `"${text}" 에 대한 대답(같은 말): ` : "";
+        const answer = answers[Math.floor(Math.random() * answers.length)];
+        box.textContent = prefix + answer;
+      });
+    })();
+
+    // 7) 누르지 마
+    (function initDontPress() {
+      const btn = document.getElementById("btn-dont");
+      const box = document.getElementById("box-dont");
+      if (!btn || !box) return;
+
+      let clicks = 0;
+
+      btn.addEventListener("click", () => {
+        clicks++;
+        let msg = "";
+
+        if (clicks === 1) {
+          msg = "그래도 한 번쯤은 참을 수 있었을 텐데… 첫 클릭 축하함.";
+        } else if (clicks < 5) {
+          msg = `지금까지 ${clicks}번 눌렀습니다. 말릴 생각은 점점 사라지는 중.`;
+        } else if (clicks < 10) {
+          msg = `여기까지 눌렀으면, 사실 말려도 안 멈출 거 알잖아. (${clicks}회 클릭)`;
+        } else if (clicks < 20) {
+          msg = `이쯤 되면 나보다 네가 더 대단하다. (${clicks}회 클릭 중)`;
+        } else {
+          msg = `좋아요. 이쯤 되면 내가 지는 걸로 할게요. 계속 눌러도 뭐 안 나옴. (${clicks}회)`;
+        }
+
+        box.textContent = msg;
+      });
+    })();
+
+    // 8) 변명 생성기
+    (function initExcuse() {
+      const btn = document.getElementById("btn-excuse");
+      const box = document.getElementById("box-excuse");
+      if (!btn || !box) return;
+
+      const excuses = [
+        "오늘 시작하면 너무 완벽하게 해버릴 것 같아서 내일로 미뤘어요.",
+        "정신적 준비 운동만 하다가 시간이 이렇게 됐습니다.",
+        "타이밍이 살짝 안 맞아서… 내일은 아마 맞을 듯요. 아마.",
+        "지금 하면 퀄리티가 아쉬울 것 같아서, 퀄리티를 지키기 위해 안 했습니다.",
+        "머릿속으로는 이미 다 해놨는데, 손이 아직 현실을 따라오지 못하고 있어요.",
+        "우주가 오늘은 쉬라고 신호를 보내는 느낌이었습니다.",
+        "지금 시작하면 중간에 끊겨서 아쉬울 것 같아서, 차라리 안 했습니다.",
+        "컨디션이 97%라서요. 이런 건 100%일 때 해야죠. 그래서 일단 안 했습니다.",
+        "일단 계획만 세우는 날이 필요하다고 스스로 합리화했습니다."
+      ];
+
+      btn.addEventListener("click", () => {
+        const excuse = excuses[Math.floor(Math.random() * excuses.length)];
+        box.textContent = "오늘 안 한 이유: " + excuse;
+      });
+    })();
+
+    // 뒤로가기 링크들: 해시를 메뉴로
+    document.querySelectorAll(".back-link").forEach(a => {
+      a.addEventListener("click", (e) => {
+        e.preventDefault();
+        location.hash = "";
+      });
+    });
+  </script>
 </body>
 </html>
