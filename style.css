@@ -1,4 +1,0 @@
-body{font-family:sans-serif;background:#111;color:#fff;display:flex;justify-content:center;align-items:center;height:100vh}
-.app-container{max-width:400px;width:100%;padding:20px}
-.menu-item{display:block;margin:8px 0;padding:10px;background:#222;color:#fff;text-decoration:none;border-radius:8px}
-.menu-item:hover{background:#333}
