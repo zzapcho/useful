@@ -7,7 +7,7 @@
   <style>
     :root {
       --bg-main: radial-gradient(circle at 10% 0%, #343579 0, #050516 40%, #020208 100%);
-      --card-bg: rgba(10, 10, 25, 0.92);
+      --card-bg: rgba(10, 10, 25, 0.96);
       --border-soft: rgba(255, 255, 255, 0.12);
       --accent: #7f5bff;
       --accent2: #ff6bd9;
@@ -19,35 +19,32 @@
       box-sizing: border-box;
     }
 
-    /* 화면 전체 높이, 기본 스크롤은 body가 담당 */
     html, body {
-      min-height: 100%;
-      margin: 0;
-      padding: 0;
+      height: 100%;
     }
 
     body {
+      margin: 0;
+      padding: 0;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       background: var(--bg-main);
       color: var(--text-main);
-      /* flex 없애고 그냥 일반 문서 레이아웃 */
-      display: block;
-      padding: 24px 16px 32px;
     }
 
+    /* 전체 카드: 상단/하단 고정, 가운데만 스크롤 */
     .app-shell {
       width: 100%;
       max-width: 520px;
-      margin: 0 auto; /* 가운데 정렬 */
+      margin: 0 auto;
+      min-height: 100vh;
       background: var(--card-bg);
       border-radius: 20px;
       border: 1px solid var(--border-soft);
       box-shadow: 0 24px 60px rgba(0, 0, 0, 0.8);
-      padding: 20px 18px 18px;
       position: relative;
-      /* 내부 스크롤 막고, 페이지 전체 스크롤만 쓰기 */
-      max-height: none;
-      overflow: visible;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
     }
 
     .glow {
@@ -58,6 +55,18 @@
         radial-gradient(circle at 100% 0, rgba(255, 107, 217, 0.12), transparent 55%);
       pointer-events: none;
       z-index: -1;
+    }
+
+    /* 상단 고정 영역 */
+    .app-header {
+      flex: 0 0 auto;
+      padding: 18px 18px 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      background: linear-gradient(
+        to bottom,
+        rgba(5, 5, 20, 0.95),
+        rgba(5, 5, 20, 0.85)
+      );
     }
 
     .app-title {
@@ -83,8 +92,33 @@
     .app-subtitle {
       font-size: 0.85rem;
       color: var(--text-soft);
-      margin-bottom: 16px;
       line-height: 1.5;
+    }
+
+    .mono {
+      font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    }
+
+    /* 가운데 스크롤 영역 */
+    .app-main {
+      flex: 1 1 auto;
+      padding: 10px 18px 10px;
+      overflow-y: auto;
+    }
+
+    /* 하단 고정 영역 */
+    .app-footer {
+      flex: 0 0 auto;
+      padding: 8px 18px 14px;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      font-size: 0.72rem;
+      color: rgba(220, 220, 255, 0.6);
+      text-align: right;
+      background: linear-gradient(
+        to top,
+        rgba(5, 5, 20, 0.95),
+        rgba(5, 5, 20, 0.85)
+      );
     }
 
     .hidden {
@@ -104,8 +138,8 @@
       display: flex;
       flex-direction: column;
       gap: 9px;
-      margin-top: 6px;
-      margin-bottom: 10px;
+      margin-top: 4px;
+      margin-bottom: 6px;
     }
 
     .menu-item {
@@ -138,13 +172,6 @@
       margin-top: 2px;
     }
 
-    .foot-note {
-      font-size: 0.72rem;
-      color: rgba(220, 220, 255, 0.6);
-      margin-top: 8px;
-      text-align: right;
-    }
-
     .back-link {
       display: inline-flex;
       align-items: center;
@@ -152,7 +179,7 @@
       font-size: 0.8rem;
       color: rgba(230, 230, 255, 0.85);
       text-decoration: none;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
     }
 
     .back-link span.icon {
@@ -265,14 +292,6 @@
       color: rgba(220, 220, 255, 0.7);
     }
 
-    .center {
-      text-align: center;
-    }
-
-    .mono {
-      font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-    }
-
     .bar-wrap {
       margin-top: 10px;
       width: 100%;
@@ -291,10 +310,7 @@
 
     @media (max-width: 480px) {
       .app-shell {
-        padding-inline: 16px;
-      }
-      .app-title {
-        font-size: 1.35rem;
+        border-radius: 0;
       }
     }
   </style>
@@ -303,8 +319,8 @@
   <div class="app-shell">
     <div class="glow"></div>
 
-    <!-- 메인 메뉴 -->
-    <section id="view-menu" class="view">
+    <!-- 위 고정 헤더 -->
+    <header class="app-header">
       <div class="app-title">
         유용한
         <span class="badge">useful</span>
@@ -313,515 +329,521 @@
         쓸모있는것들 모음 zip<br />
         <span class="mono">제출용</span>
       </div>
-
-      <div class="menu-list">
-        <a href="#nothing" class="menu-item">
-          <div class="menu-title">1. 아무것도 안 함</div>
-          <div class="menu-desc">버튼을 눌렀는데 아무 일도 안 일어나는 경험.</div>
-        </a>
-
-        <a href="#nope" class="menu-item">
-          <div class="menu-title">2. 그거 아님</div>
-          <div class="menu-desc">네가 뭐라 하든 일단 부터 부정하고 보는 머신.</div>
-        </a>
-
-        <a href="#judge" class="menu-item">
-          <div class="menu-title">3. 판정</div>
-          <div class="menu-desc">모든 선택을 애매하게 평가해서 기분 묘하게 만들기.</div>
-        </a>
-
-        <a href="#fuzzy-clock" class="menu-item">
-          <div class="menu-title">4. 대충 시계</div>
-          <div class="menu-desc">정확한 시간 대신 인생 코멘트를 날리는 시계.</div>
-        </a>
-
-        <a href="#counter" class="menu-item">
-          <div class="menu-title">5. 이거 누르는 앱</div>
-          <div class="menu-desc">숫자는 오르는데 인생은 그대로, 저장도 안 됨.</div>
-        </a>
-
-        <a href="#fake-ai" class="menu-item">
-          <div class="menu-title">6. 아마 AI</div>
-          <div class="menu-desc">AI인 척하면서 아무 말이나 하는 가짜 조언가.</div>
-        </a>
-
-        <a href="#dont-press" class="menu-item">
-          <div class="menu-title">7. 누르지 마</div>
-          <div class="menu-desc">누르지 말라니까 더 누르고 싶은 그 버튼.</div>
-        </a>
-
-        <a href="#excuse" class="menu-item">
-          <div class="menu-title">8. 변명 생성기</div>
-          <div class="menu-desc">지금 아무것도 안 한 이유를 자동으로 만들어줌.</div>
-        </a>
-
-        <!-- DLC들 -->
-        <a href="#task-priority" class="menu-item">
-          <div class="menu-title">9. 숙제 우선순위 랜덤 결정기</div>
-          <div class="menu-desc">뭐부터 할지 고민하는 시간 = 랜덤 돌리는 시간.</div>
-        </a>
-
-        <a href="#study-timer" class="menu-item">
-          <div class="menu-title">10. 공부한 척 타이머</div>
-          <div class="menu-desc">실제 공부했는지보다 타이머 켰는지가 중요함.</div>
-        </a>
-
-        <a href="#today-or-tomorrow" class="menu-item">
-          <div class="menu-title">11. 내일 할까 오늘 할까</div>
-          <div class="menu-desc">결정 장애를 코인토스로 해결.</div>
-        </a>
-
-        <a href="#self-esteem" class="menu-item">
-          <div class="menu-title">12. 자존감 측정기</div>
-          <div class="menu-desc">랜덤 숫자로 기분 건드리기.</div>
-        </a>
-
-        <a href="#quote" class="menu-item">
-          <div class="menu-title">13. 오늘의 한마디</div>
-          <div class="menu-desc">명언인 척하지만 약간 병맛.</div>
-        </a>
-
-        <a href="#self-survey" class="menu-item">
-          <div class="menu-title">14. 자기 상태 설문</div>
-          <div class="menu-desc">피곤/귀찮/하기싫음 수치화하기.</div>
-        </a>
-
-        <a href="#random-chooser" class="menu-item">
-          <div class="menu-title">15. 결정 장애 해결기</div>
-          <div class="menu-desc">선택지 적고 하나 랜덤으로 뽑기.</div>
-        </a>
-
-        <a href="#todo-split" class="menu-item">
-          <div class="menu-title">16. 오늘 할 일 vs 안 할 일</div>
-          <div class="menu-desc">할 일 목록을 랜덤으로 두 구역에 분류.</div>
-        </a>
-
-        <a href="#phone-mission" class="menu-item">
-          <div class="menu-title">17. 폰 내려놓기 미션</div>
-          <div class="menu-desc">지금 자리에서 할 수 있는 짧은 미션.</div>
-        </a>
-
-        <a href="#useless-calc" class="menu-item">
-          <div class="menu-title">18. 쓸데없는 계산기</div>
-          <div class="menu-desc">숫자를 넣으면 의미 없는 분석을 해줌.</div>
-        </a>
-
-        <a href="#fake-offline" class="menu-item">
-          <div class="menu-title">19. 인터넷 연결 안 됨 시뮬레이터</div>
-          <div class="menu-desc">사실 되는데 안 되는 척 하는 화면.</div>
-        </a>
-      </div>
-
-      <div class="foot-note">
-        made by zzapcho
-      </div>
-    </section>
-
-    <!-- 1. 아무것도 안 함 -->
-    <section id="view-nothing" class="view hidden">
-      <a href="#" class="back-link"><span class="icon">←</span> 메뉴로 도망가기</a>
-      <div class="view-title">아무것도 안 함</div>
-      <div class="view-subtitle">
-        UX, 기능, 감동, 전부 없음. <br>  
-        진짜로 <strong>“아무 일도 안 일어나는 경험”</strong>을 제공합니다.
-      </div>
-
-      <button class="btn" id="btn-nothing">아무것도 하기</button>
-      <div class="box" id="box-nothing">
-        아직 아무것도 안 했습니다. <br>  
-        사실 이 상태가 인생에서 제일 평화로울지도?
-      </div>
-    </section>
-
-    <!-- 2. 그거 아님 -->
-    <section id="view-nope" class="view hidden">
-      <a href="#" class="back-link"><span class="icon">←</span> 메뉴로 도망가기</a>
-      <div class="view-title">그거 아님</div>
-      <div class="view-subtitle">
-        뭐라고 말해도 일단 부정부터 하고 보는 <br>  
-        <strong>존재 자체가 토론 방해꾼인 앱</strong>.
-      </div>
-
-      <div class="field">
-        <label for="in-nope">하고 싶은 말 / 주장</label>
-        <input id="in-nope" type="text" placeholder="예: 이번엔 진짜 열심히 할 듯" />
-      </div>
-
-      <button class="btn" id="btn-nope">확인 받기 (하지만 부정당함)</button>
-
-      <div class="box" id="box-nope">
-        아직 아무 말도 안 했는데, 그래도 그건 아닌 것 같음.
-      </div>
-    </section>
-
-    <!-- 3. 판정 -->
-    <section id="view-judge" class="view hidden">
-      <a href="#" class="back-link"><span class="icon">←</span> 메뉴로 도망가기</a>
-      <div class="view-title">판정</div>
-      <div class="view-subtitle">
-        인생의 선택들을 <strong>절대 확실하게 말해주지 않는</strong> <br> 애매함 전문 판정 기계.
-      </div>
-
-      <div class="field">
-        <label for="in-judge">판정받고 싶은 행동 / 선택</label>
-        <input id="in-judge" type="text" placeholder="예: 오늘 숙제 미룸" />
-      </div>
-
-      <button class="btn" id="btn-judge">판정받기</button>
-
-      <div class="box" id="box-judge">
-        아직 판정이 내려지지 않았습니다. <br>  
-        이 순간이 가장 안전한 상태입니다.
-      </div>
-    </section>
-
-    <!-- 4. 대충 시계 -->
-    <section id="view-fuzzy-clock" class="view hidden">
-      <a href="#" class="back-link"><span class="icon">←</span> 메뉴로 도망가기</a>
-      <div class="view-title">대충 시계</div>
-      <div class="view-subtitle">
-        정확한 시각은 알려주지만, <br>  
-        <strong>멘탈만 상하게 하는 해석</strong>을 덤으로 붙여주는 시계.
-      </div>
-
-      <button class="btn" id="btn-time">지금 시간이 어느 정도냐</button>
-
-      <div class="box" id="box-time">
-        아직 시간에 대한 압박은 시작되지 않았습니다. 아마도.
-      </div>
-
-      <div class="small-text">
-        실제 시간을 가져오지만, 해석은 매우 편파적이고 기분 나쁠 수 있음.
-      </div>
-    </section>
-
-    <!-- 5. 이거 누르는 앱 -->
-    <section id="view-counter" class="view hidden">
-      <a href="#" class="back-link"><span class="icon">←</span> 메뉴로 도망가기</a>
-      <div class="view-title">이거 누르는 앱</div>
-      <div class="view-subtitle">
-        누를수록 숫자는 늘어나지만,  
-        <strong>저장도 안 되고 아무 의미도 없는 카운터</strong>.
-      </div>
-
-      <div class="box">
-        지금까지 이 버튼을 누른 횟수: <strong id="label-count">0</strong>
-      </div>
-
-      <button class="btn btn-wide" id="btn-count">이거 누르기</button>
-
-      <div class="small-text">
-        새로고침하면 숫자는 깨끗하게 사라집니다.  
-        노력보다 브라우저 캐시가 강한 시대.
-      </div>
-    </section>
-
-    <!-- 6. 아마 AI -->
-    <section id="view-fake-ai" class="view hidden">
-      <a href="#" class="back-link"><span class="icon">←</span> 메뉴로 도망가기</a>
-      <div class="view-title">아마 AI</div>
-      <div class="view-subtitle">
-        진지한 AI 답변을 기대했다면 잘못 찾아왔고, <br> 
-        <strong>애매한 말만 램덤으로 뱉는 가짜 상담사</strong>.
-      </div>
-
-      <div class="field">
-        <label for="in-fake">고민 / 질문 / 그냥 아무 말</label>
-        <textarea id="in-fake" placeholder="예: 내일부터 진짜 공부할까 말까 고민됨"></textarea>
-      </div>
-
-      <button class="btn" id="btn-fake">아마 대답 듣기</button>
-
-      <div class="box" id="box-fake">
-        아직 아무 말도 안 했지만, <br> 
-        이미 답은 마음속에 있을지도 모릅니다. 아마도.
-      </div>
-    </section>
-
-    <!-- 7. 누르지 마 -->
-    <section id="view-dont-press" class="view hidden">
-      <a href="#" class="back-link"><span class="icon">←</span> 메뉴로 도망가기</a>
-      <div class="view-title">누르지 마</div>
-      <div class="view-subtitle">
-        인간이 얼마나 <strong>“하지 말라면 더 하는 존재”</strong>인지 보는 심리 실험 버튼.
-      </div>
-
-      <button class="btn btn-wide" id="btn-dont">누르지 마</button>
-
-      <div class="box" id="box-dont">
-        아직은 안 눌렀네. 이 정도면 참을성 있는 편.
-      </div>
-
-      <div class="small-text">
-        여러 번 누르면 이 앱이 널 포기하기 시작합니다.
-      </div>
-    </section>
-
-    <!-- 8. 변명 생성기 -->
-    <section id="view-excuse" class="view hidden">
-      <a href="#" class="back-link"><span class="icon">←</span> 메뉴로 도망가기</a>
-      <div class="view-title">변명 생성기</div>
-      <div class="view-subtitle">
-        지금 아무것도 안 한 이유를 <br> 
-        <strong>그럴듯하지만 전혀 생산적이지 않게 포장</strong>해드립니다.
-      </div>
-
-      <button class="btn" id="btn-excuse">변명 생성하기</button>
-
-      <div class="box" id="box-excuse">
-        아직은 변명할 필요도 없이 그냥 안 하고 있는 상태입니다.
-      </div>
-
-      <div class="small-text">
-        선생님/부모님에게 실제로 쓰진 말고,  
-        <span class="mono">“아 나 진짜 이럴 줄 알았다”</span> 하면서 보기만 하자.
-      </div>
-    </section>
-
-    <!-- 9. 숙제 우선순위 랜덤 결정기 -->
-    <section id="view-task-priority" class="view hidden">
-      <a href="#" class="back-link"><span class="icon">←</span> 메뉴로 도망가기</a>
-      <div class="view-title">숙제 우선순위 랜덤 결정기</div>
-      <div class="view-subtitle">
-        “뭐부터 할까” 고민하는 시간 대신, <br>
-        “랜덤 돌리고 탓하기”를 선택하는 도구.
-      </div>
-
-      <div class="field">
-        <label for="in-priority">숙제 / 할 일 목록 (한 줄에 하나씩)</label>
-        <textarea id="in-priority" placeholder="국어 숙제&#10;수학 문제집 30쪽&#10;영어 단어 외우기"></textarea>
-      </div>
-
-      <button class="btn" id="btn-priority">뭐부터 할지 정해줘</button>
-
-      <div class="box" id="box-priority">
-        위에 할 일을 한 줄씩 적고 버튼을 누르면, <br>
-        오늘의 희생양을 한 명 뽑아드립니다.
-      </div>
-    </section>
-
-    <!-- 10. 공부한 척 타이머 -->
-    <section id="view-study-timer" class="view hidden">
-      <a href="#" class="back-link"><span class="icon">←</span> 메뉴로 도망가기</a>
-      <div class="view-title">공부한 척 타이머</div>
-      <div class="view-subtitle">
-        실제로 뭘 했는지는 중요하지 않다. <br>
-        <strong>“타이머를 켰다”는 사실</strong>이 중요하다.
-      </div>
-
-      <button class="btn" id="btn-study-timer">타이머 시작</button>
-
-      <div class="box" id="box-study-timer">
-        아직 공부한 척을 시작하지 않았습니다.
-      </div>
-
-      <div class="small-text">
-        이 타이머는 어디에도 저장되지 않습니다. <br>
-        다만 네 마음속에선 이미 한 시간 한 걸로 기록될 수 있음.
-      </div>
-    </section>
-
-    <!-- 11. 내일 할까 오늘 할까 -->
-    <section id="view-today-or-tomorrow" class="view hidden">
-      <a href="#" class="back-link"><span class="icon">←</span> 메뉴로 도망가기</a>
-      <div class="view-title">내일 할까 오늘 할까</div>
-      <div class="view-subtitle">
-        이미 마음속으로는 정해놨으면서, <br>
-        누가 대신 결정해주길 바라는 그 마음을 존중합니다.
-      </div>
-
-      <div class="field">
-        <label for="in-todaytom">고민 중인 일 (선택)</label>
-        <input id="in-todaytom" type="text" placeholder="예: 영어 단어 외우기" />
-      </div>
-
-      <button class="btn" id="btn-todaytom">결정해줘</button>
-
-      <div class="box" id="box-todaytom">
-        “오늘 할까 내일 할까” <br>
-        고민 중인 일이 있다면 위에 살짝 적어도 됨. 안 적어도 됨.
-      </div>
-    </section>
-
-    <!-- 12. 자존감 측정기 -->
-    <section id="view-self-esteem" class="view hidden">
-      <a href="#" class="back-link"><span class="icon">←</span> 메뉴로 도망가기</a>
-      <div class="view-title">자존감 측정기</div>
-      <div class="view-subtitle">
-        과학적인 근거는 1도 없고, <br>
-        랜덤 숫자로 기분만 살짝 건드리는 장난용 도구.
-      </div>
-
-      <button class="btn" id="btn-esteem">오늘 자존감 측정하기</button>
-
-      <div class="box" id="box-esteem">
-        아직 자존감을 측정하지 않았습니다. <br>
-        측정 안 한 자존감이 제일 건강할지도?
-        <div class="bar-wrap">
-          <div class="bar-fill" id="bar-esteem"></div>
+    </header>
+
+    <!-- 가운데 스크롤 영역 -->
+    <main class="app-main">
+      <!-- 메인 메뉴 -->
+      <section id="view-menu" class="view">
+        <div class="menu-list">
+          <a href="#nothing" class="menu-item">
+            <div class="menu-title">1. 아무것도 안 함</div>
+            <div class="menu-desc">버튼을 눌렀는데 아무 일도 안 일어나는 경험.</div>
+          </a>
+
+          <a href="#nope" class="menu-item">
+            <div class="menu-title">2. 그거 아님</div>
+            <div class="menu-desc">네가 뭐라 하든 일단 부터 부정하고 보는 머신.</div>
+          </a>
+
+          <a href="#judge" class="menu-item">
+            <div class="menu-title">3. 판정</div>
+            <div class="menu-desc">모든 선택을 애매하게 평가해서 기분 묘하게 만들기.</div>
+          </a>
+
+          <a href="#fuzzy-clock" class="menu-item">
+            <div class="menu-title">4. 대충 시계</div>
+            <div class="menu-desc">정확한 시간 대신 인생 코멘트를 날리는 시계.</div>
+          </a>
+
+          <a href="#counter" class="menu-item">
+            <div class="menu-title">5. 이거 누르는 앱</div>
+            <div class="menu-desc">숫자는 오르는데 인생은 그대로, 저장도 안 됨.</div>
+          </a>
+
+          <a href="#fake-ai" class="menu-item">
+            <div class="menu-title">6. 아마 AI</div>
+            <div class="menu-desc">AI인 척하면서 아무 말이나 하는 가짜 조언가.</div>
+          </a>
+
+          <a href="#dont-press" class="menu-item">
+            <div class="menu-title">7. 누르지 마</div>
+            <div class="menu-desc">누르지 말라니까 더 누르고 싶은 그 버튼.</div>
+          </a>
+
+          <a href="#excuse" class="menu-item">
+            <div class="menu-title">8. 변명 생성기</div>
+            <div class="menu-desc">지금 아무것도 안 한 이유를 자동으로 만들어줌.</div>
+          </a>
+
+          <a href="#task-priority" class="menu-item">
+            <div class="menu-title">9. 숙제 우선순위 랜덤 결정기</div>
+            <div class="menu-desc">뭐부터 할지 고민하는 시간 = 랜덤 돌리는 시간.</div>
+          </a>
+
+          <a href="#study-timer" class="menu-item">
+            <div class="menu-title">10. 공부한 척 타이머</div>
+            <div class="menu-desc">실제 공부했는지보다 타이머 켰는지가 중요함.</div>
+          </a>
+
+          <a href="#today-or-tomorrow" class="menu-item">
+            <div class="menu-title">11. 내일 할까 오늘 할까</div>
+            <div class="menu-desc">결정 장애를 코인토스로 해결.</div>
+          </a>
+
+          <a href="#self-esteem" class="menu-item">
+            <div class="menu-title">12. 자존감 측정기</div>
+            <div class="menu-desc">랜덤 숫자로 기분 건드리기.</div>
+          </a>
+
+          <a href="#quote" class="menu-item">
+            <div class="menu-title">13. 오늘의 한마디</div>
+            <div class="menu-desc">명언인 척하지만 약간 병맛.</div>
+          </a>
+
+          <a href="#self-survey" class="menu-item">
+            <div class="menu-title">14. 자기 상태 설문</div>
+            <div class="menu-desc">피곤/귀찮/하기싫음 수치화하기.</div>
+          </a>
+
+          <a href="#random-chooser" class="menu-item">
+            <div class="menu-title">15. 결정 장애 해결기</div>
+            <div class="menu-desc">선택지 적고 하나 랜덤으로 뽑기.</div>
+          </a>
+
+          <a href="#todo-split" class="menu-item">
+            <div class="menu-title">16. 오늘 할 일 vs 안 할 일</div>
+            <div class="menu-desc">할 일 목록을 랜덤으로 두 구역에 분류.</div>
+          </a>
+
+          <a href="#phone-mission" class="menu-item">
+            <div class="menu-title">17. 폰 내려놓기 미션</div>
+            <div class="menu-desc">지금 자리에서 할 수 있는 짧은 미션.</div>
+          </a>
+
+          <a href="#useless-calc" class="menu-item">
+            <div class="menu-title">18. 쓸데없는 계산기</div>
+            <div class="menu-desc">숫자를 넣으면 의미 없는 분석을 해줌.</div>
+          </a>
+
+          <a href="#fake-offline" class="menu-item">
+            <div class="menu-title">19. 인터넷 연결 안 됨 시뮬레이터</div>
+            <div class="menu-desc">사실 되는데 안 되는 척 하는 화면.</div>
+          </a>
         </div>
-      </div>
-    </section>
+      </section>
 
-    <!-- 13. 오늘의 한마디 -->
-    <section id="view-quote" class="view hidden">
-      <a href="#" class="back-link"><span class="icon">←</span> 메뉴로 도망가기</a>
-      <div class="view-title">오늘의 한마디</div>
-      <div class="view-subtitle">
-        진지한 명언처럼 보이지만, <br>
-        어디선가 망가진 느낌이 나는 문장들.
-      </div>
+      <!-- 1. 아무것도 안 함 -->
+      <section id="view-nothing" class="view hidden">
+        <a href="#" class="back-link"><span class="icon">←</span> 메뉴로 도망가기</a>
+        <div class="view-title">아무것도 안 함</div>
+        <div class="view-subtitle">
+          UX, 기능, 감동, 전부 없음. <br>  
+          진짜로 <strong>“아무 일도 안 일어나는 경험”</strong>을 제공합니다.
+        </div>
 
-      <button class="btn" id="btn-quote">한마디 뽑기</button>
+        <button class="btn" id="btn-nothing">아무것도 하기</button>
+        <div class="box" id="box-nothing">
+          아직 아무것도 안 했습니다. <br>  
+          사실 이 상태가 인생에서 제일 평화로울지도?
+        </div>
+      </section>
 
-      <div class="box" id="box-quote">
-        오늘의 멘트가 아직 정해지지 않았습니다. <br>
-        버튼을 눌러 대충 인생 조언을 받아보세요.
-      </div>
-    </section>
+      <!-- 2. 그거 아님 -->
+      <section id="view-nope" class="view hidden">
+        <a href="#" class="back-link"><span class="icon">←</span> 메뉴로 도망가기</a>
+        <div class="view-title">그거 아님</div>
+        <div class="view-subtitle">
+          뭐라고 말해도 일단 부정부터 하고 보는 <br>  
+          <strong>존재 자체가 토론 방해꾼인 앱</strong>.
+        </div>
 
-    <!-- 14. 자기 상태 설문 -->
-    <section id="view-self-survey" class="view hidden">
-      <a href="#" class="back-link"><span class="icon">←</span> 메뉴로 도망가기</a>
-      <div class="view-title">자기 상태 설문</div>
-      <div class="view-subtitle">
-        피곤함, 귀찮음, 하기 싫음 정도를 <br>
-        숫자로 표현해보고 스스로 놀라기.
-      </div>
+        <div class="field">
+          <label for="in-nope">하고 싶은 말 / 주장</label>
+          <input id="in-nope" type="text" placeholder="예: 이번엔 진짜 열심히 할 듯" />
+        </div>
 
-      <div class="field">
-        <label for="range-tired">피곤함 (0 = 멀쩡, 10 = 뼈까지 피곤)</label>
-        <input type="range" id="range-tired" min="0" max="10" value="5" />
-      </div>
+        <button class="btn" id="btn-nope">확인 받기 (하지만 부정당함)</button>
 
-      <div class="field">
-        <label for="range-lazy">귀찮음 (0 = 상쾌, 10 = 모든 게 귀찮음)</label>
-        <input type="range" id="range-lazy" min="0" max="10" value="7" />
-      </div>
+        <div class="box" id="box-nope">
+          아직 아무 말도 안 했는데, 그래도 그건 아닌 것 같음.
+        </div>
+      </section>
 
-      <div class="field">
-        <label for="range-dontwant">하기 싫음 (0 = 할 의욕 있음, 10 = 세상 다 싫음)</label>
-        <input type="range" id="range-dontwant" min="0" max="10" value="6" />
-      </div>
+      <!-- 3. 판정 -->
+      <section id="view-judge" class="view hidden">
+        <a href="#" class="back-link"><span class="icon">←</span> 메뉴로 도망가기</a>
+        <div class="view-title">판정</div>
+        <div class="view-subtitle">
+          인생의 선택들을 <strong>절대 확실하게 말해주지 않는</strong> <br> 애매함 전문 판정 기계.
+        </div>
 
-      <button class="btn" id="btn-survey">결과 보기</button>
+        <div class="field">
+          <label for="in-judge">판정받고 싶은 행동 / 선택</label>
+          <input id="in-judge" type="text" placeholder="예: 오늘 숙제 미룸" />
+        </div>
 
-      <div class="box" id="box-survey">
-        슬라이더를 적당히 움직이고 버튼을 누르면, <br>
-        오늘의 상태를 애매하게 정리해드립니다.
-      </div>
-    </section>
+        <button class="btn" id="btn-judge">판정받기</button>
 
-    <!-- 15. 결정 장애 해결기 -->
-    <section id="view-random-chooser" class="view hidden">
-      <a href="#" class="back-link"><span class="icon">←</span> 메뉴로 도망가기</a>
-      <div class="view-title">결정 장애 해결기</div>
-      <div class="view-subtitle">
-        “뭘 먹지?”, “뭐 하지?” 같은 질문을 <br>
-        랜덤에게 외주 주는 시스템.
-      </div>
+        <div class="box" id="box-judge">
+          아직 판정이 내려지지 않았습니다. <br>  
+          이 순간이 가장 안전한 상태입니다.
+        </div>
+      </section>
 
-      <div class="field">
-        <label for="in-random-chooser">선택지 목록 (한 줄에 하나씩)</label>
-        <textarea id="in-random-chooser" placeholder="라면&#10;치킨&#10;피자&#10;그냥 굶기"></textarea>
-      </div>
+      <!-- 4. 대충 시계 -->
+      <section id="view-fuzzy-clock" class="view hidden">
+        <a href="#" class="back-link"><span class="icon">←</span> 메뉴로 도망가기</a>
+        <div class="view-title">대충 시계</div>
+        <div class="view-subtitle">
+          정확한 시각은 알려주지만, <br>  
+          <strong>멘탈만 상하게 하는 해석</strong>을 덤으로 붙여주는 시계.
+        </div>
 
-      <button class="btn" id="btn-random-chooser">골라줘</button>
+        <button class="btn" id="btn-time">지금 시간이 어느 정도냐</button>
 
-      <div class="box" id="box-random-chooser">
-        위에 선택지를 적고 버튼을 누르면, <br>
-        이미 네가 마음속으로 골라놨던 걸 랜덤이 골라줄 수도 있음.
-      </div>
-    </section>
+        <div class="box" id="box-time">
+          아직 시간에 대한 압박은 시작되지 않았습니다. 아마도.
+        </div>
 
-    <!-- 16. 오늘 할 일 vs 안 할 일 -->
-    <section id="view-todo-split" class="view hidden">
-      <a href="#" class="back-link"><span class="icon">←</span> 메뉴로 도망가기</a>
-      <div class="view-title">오늘 할 일 vs 안 할 일</div>
-      <div class="view-subtitle">
-        오늘 할 일 목록을 랜덤으로 두 그룹으로 나눠서, <br>
-        책임을 알고리즘에게 떠넘기는 기술.
-      </div>
+        <div class="small-text">
+          실제 시간을 가져오지만, 해석은 매우 편파적이고 기분 나쁠 수 있음.
+        </div>
+      </section>
 
-      <div class="field">
-        <label for="in-todo-split">할 일 목록 (한 줄에 하나씩)</label>
-        <textarea id="in-todo-split" placeholder="국어 숙제&#10;수학 문제집&#10;영어 단어&#10;방 정리"></textarea>
-      </div>
+      <!-- 5. 이거 누르는 앱 -->
+      <section id="view-counter" class="view hidden">
+        <a href="#" class="back-link"><span class="icon">←</span> 메뉴로 도망가기</a>
+        <div class="view-title">이거 누르는 앱</div>
+        <div class="view-subtitle">
+          누를수록 숫자는 늘어나지만,  
+          <strong>저장도 안 되고 아무 의미도 없는 카운터</strong>.
+        </div>
 
-      <button class="btn" id="btn-todo-split">분류하기</button>
+        <div class="box">
+          지금까지 이 버튼을 누른 횟수: <strong id="label-count">0</strong>
+        </div>
 
-      <div class="box" id="box-todo-split">
-        할 일을 쓰고 분류하면, <br>
-        ✅ 오늘 할 일 / ❌ 오늘 안 할 일 로 나눠드립니다.
-      </div>
+        <button class="btn btn-wide" id="btn-count">이거 누르기</button>
 
-      <div class="small-text">
-        참고: “오늘 안 할 일”이라고 해서 진짜 안 해도 되는 건 아님.
-      </div>
-    </section>
+        <div class="small-text">
+          새로고침하면 숫자는 깨끗하게 사라집니다.  
+          노력보다 브라우저 캐시가 강한 시대.
+        </div>
+      </section>
 
-    <!-- 17. 폰 내려놓기 미션 -->
-    <section id="view-phone-mission" class="view hidden">
-      <a href="#" class="back-link"><span class="icon">←</span> 메뉴로 도망가기</a>
-      <div class="view-title">폰 내려놓기 미션</div>
-      <div class="view-subtitle">
-        폰을 당장은 못 끄더라도, <br>
-        최소한 몇 초 정도는 현실 세계에 접속해보자.
-      </div>
+      <!-- 6. 아마 AI -->
+      <section id="view-fake-ai" class="view hidden">
+        <a href="#" class="back-link"><span class="icon">←</span> 메뉴로 도망가기</a>
+        <div class="view-title">아마 AI</div>
+        <div class="view-subtitle">
+          진지한 AI 답변을 기대했다면 잘못 찾아왔고, <br> 
+          <strong>애매한 말만 램덤으로 뱉는 가짜 상담사</strong>.
+        </div>
 
-      <button class="btn" id="btn-phone-mission">지금 당장 할 수 있는 미션 뽑기</button>
+        <div class="field">
+          <label for="in-fake">고민 / 질문 / 그냥 아무 말</label>
+          <textarea id="in-fake" placeholder="예: 내일부터 진짜 공부할까 말까 고민됨"></textarea>
+        </div>
 
-      <div class="box" id="box-phone-mission">
-        버튼을 누르면, <br>
-        자리에서 바로 할 수 있는 짧은 미션을 하나 드립니다.
-      </div>
-    </section>
+        <button class="btn" id="btn-fake">아마 대답 듣기</button>
 
-    <!-- 18. 쓸데없는 계산기 -->
-    <section id="view-useless-calc" class="view hidden">
-      <a href="#" class="back-link"><span class="icon">←</span> 메뉴로 도망가기</a>
-      <div class="view-title">쓸데없는 계산기</div>
-      <div class="view-subtitle">
-        숫자를 넣으면 정답 대신, <br>
-        아무 의미 없는 분석을 해드립니다.
-      </div>
+        <div class="box" id="box-fake">
+          아직 아무 말도 안 했지만, <br> 
+          이미 답은 마음속에 있을지도 모릅니다. 아마도.
+        </div>
+      </section>
 
-      <div class="field">
-        <label for="in-useless-num">아무 숫자나 넣어보세요</label>
-        <input id="in-useless-num" type="number" placeholder="예: 42" />
-      </div>
+      <!-- 7. 누르지 마 -->
+      <section id="view-dont-press" class="view hidden">
+        <a href="#" class="back-link"><span class="icon">←</span> 메뉴로 도망가기</a>
+        <div class="view-title">누르지 마</div>
+        <div class="view-subtitle">
+          인간이 얼마나 <strong>“하지 말라면 더 하는 존재”</strong>인지 보는 심리 실험 버튼.
+        </div>
 
-      <button class="btn" id="btn-useless-calc">분석하기</button>
+        <button class="btn btn-wide" id="btn-dont">누르지 마</button>
 
-      <div class="box" id="box-useless-calc">
-        숫자를 하나 넣고 버튼을 누르면, <br>
-        진지한 척하는 이상한 분석이 나옵니다.
-      </div>
-    </section>
+        <div class="box" id="box-dont">
+          아직은 안 눌렀네. 이 정도면 참을성 있는 편.
+        </div>
 
-    <!-- 19. 인터넷 연결 안 됨 시뮬레이터 -->
-    <section id="view-fake-offline" class="view hidden">
-      <a href="#" class="back-link"><span class="icon">←</span> 메뉴로 도망가기</a>
-      <div class="view-title">인터넷 연결 안 됨 시뮬레이터</div>
-      <div class="view-subtitle">
-        실제로는 잘 되는데, <br>
-        그냥 “안 되는 척” 하는 화면.
-      </div>
+        <div class="small-text">
+          여러 번 누르면 이 앱이 널 포기하기 시작합니다.
+        </div>
+      </section>
 
-      <div class="box" id="box-offline">
-        <strong>인터넷 연결 없음</strong><br><br>
-        이 페이지는 네가 공부나 다른 일을 하도록 돕기 위해 <br>
-        인터넷이 끊긴 척 하고 있습니다.<br><br>
-        사실은 잘 연결되어 있을 가능성이 매우 높습니다.
-      </div>
+      <!-- 8. 변명 생성기 -->
+      <section id="view-excuse" class="view hidden">
+        <a href="#" class="back-link"><span class="icon">←</span> 메뉴로 도망가기</a>
+        <div class="view-title">변명 생성기</div>
+        <div class="view-subtitle">
+          지금 아무것도 안 한 이유를 <br> 
+          <strong>그럴듯하지만 전혀 생산적이지 않게 포장</strong>해드립니다.
+        </div>
 
-      <button class="btn btn-ghost" id="btn-offline">문제 진단하기</button>
+        <button class="btn" id="btn-excuse">변명 생성하기</button>
 
-      <div class="small-text">
-        진짜로 인터넷이 끊긴 게 아니라면, <br>
-        지금 이 페이지를 보고 있다는 사실 자체가 증거임.
-      </div>
-    </section>
+        <div class="box" id="box-excuse">
+          아직은 변명할 필요도 없이 그냥 안 하고 있는 상태입니다.
+        </div>
+
+        <div class="small-text">
+          선생님/부모님에게 실제로 쓰진 말고,  
+          <span class="mono">“아 나 진짜 이럴 줄 알았다”</span> 하면서 보기만 하자.
+        </div>
+      </section>
+
+      <!-- 9. 숙제 우선순위 랜덤 결정기 -->
+      <section id="view-task-priority" class="view hidden">
+        <a href="#" class="back-link"><span class="icon">←</span> 메뉴로 도망가기</a>
+        <div class="view-title">숙제 우선순위 랜덤 결정기</div>
+        <div class="view-subtitle">
+          “뭐부터 할까” 고민하는 시간 대신, <br>
+          “랜덤 돌리고 탓하기”를 선택하는 도구.
+        </div>
+
+        <div class="field">
+          <label for="in-priority">숙제 / 할 일 목록 (한 줄에 하나씩)</label>
+          <textarea id="in-priority" placeholder="국어 숙제&#10;수학 문제집 30쪽&#10;영어 단어 외우기"></textarea>
+        </div>
+
+        <button class="btn" id="btn-priority">뭐부터 할지 정해줘</button>
+
+        <div class="box" id="box-priority">
+          위에 할 일을 한 줄씩 적고 버튼을 누르면, <br>
+          오늘의 희생양을 한 명 뽑아드립니다.
+        </div>
+      </section>
+
+      <!-- 10. 공부한 척 타이머 -->
+      <section id="view-study-timer" class="view hidden">
+        <a href="#" class="back-link"><span class="icon">←</span> 메뉴로 도망가기</a>
+        <div class="view-title">공부한 척 타이머</div>
+        <div class="view-subtitle">
+          실제로 뭘 했는지는 중요하지 않다. <br>
+          <strong>“타이머를 켰다”는 사실</strong>이 중요하다.
+        </div>
+
+        <button class="btn" id="btn-study-timer">타이머 시작</button>
+
+        <div class="box" id="box-study-timer">
+          아직 공부한 척을 시작하지 않았습니다.
+        </div>
+
+        <div class="small-text">
+          이 타이머는 어디에도 저장되지 않습니다. <br>
+          다만 네 마음속에선 이미 한 시간 한 걸로 기록될 수 있음.
+        </div>
+      </section>
+
+      <!-- 11. 내일 할까 오늘 할까 -->
+      <section id="view-today-or-tomorrow" class="view hidden">
+        <a href="#" class="back-link"><span class="icon">←</span> 메뉴로 도망가기</a>
+        <div class="view-title">내일 할까 오늘 할까</div>
+        <div class="view-subtitle">
+          이미 마음속으로는 정해놨으면서, <br>
+          누가 대신 결정해주길 바라는 그 마음을 존중합니다.
+        </div>
+
+        <div class="field">
+          <label for="in-todaytom">고민 중인 일 (선택)</label>
+          <input id="in-todaytom" type="text" placeholder="예: 영어 단어 외우기" />
+        </div>
+
+        <button class="btn" id="btn-todaytom">결정해줘</button>
+
+        <div class="box" id="box-todaytom">
+          “오늘 할까 내일 할까” <br>
+          고민 중인 일이 있다면 위에 살짝 적어도 됨. 안 적어도 됨.
+        </div>
+      </section>
+
+      <!-- 12. 자존감 측정기 -->
+      <section id="view-self-esteem" class="view hidden">
+        <a href="#" class="back-link"><span class="icon">←</span> 메뉴로 도망가기</a>
+        <div class="view-title">자존감 측정기</div>
+        <div class="view-subtitle">
+          과학적인 근거는 1도 없고, <br>
+          랜덤 숫자로 기분만 살짝 건드리는 장난용 도구.
+        </div>
+
+        <button class="btn" id="btn-esteem">오늘 자존감 측정하기</button>
+
+        <div class="box" id="box-esteem">
+          아직 자존감을 측정하지 않았습니다. <br>
+          측정 안 한 자존감이 제일 건강할지도?
+          <div class="bar-wrap">
+            <div class="bar-fill" id="bar-esteem"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 13. 오늘의 한마디 -->
+      <section id="view-quote" class="view hidden">
+        <a href="#" class="back-link"><span class="icon">←</span> 메뉴로 도망가기</a>
+        <div class="view-title">오늘의 한마디</div>
+        <div class="view-subtitle">
+          진지한 명언처럼 보이지만, <br>
+          어디선가 망가진 느낌이 나는 문장들.
+        </div>
+
+        <button class="btn" id="btn-quote">한마디 뽑기</button>
+
+        <div class="box" id="box-quote">
+          오늘의 멘트가 아직 정해지지 않았습니다. <br>
+          버튼을 눌러 대충 인생 조언을 받아보세요.
+        </div>
+      </section>
+
+      <!-- 14. 자기 상태 설문 -->
+      <section id="view-self-survey" class="view hidden">
+        <a href="#" class="back-link"><span class="icon">←</span> 메뉴로 도망가기</a>
+        <div class="view-title">자기 상태 설문</div>
+        <div class="view-subtitle">
+          피곤함, 귀찮음, 하기 싫음 정도를 <br>
+          숫자로 표현해보고 스스로 놀라기.
+        </div>
+
+        <div class="field">
+          <label for="range-tired">피곤함 (0 = 멀쩡, 10 = 뼈까지 피곤)</label>
+          <input type="range" id="range-tired" min="0" max="10" value="5" />
+        </div>
+
+        <div class="field">
+          <label for="range-lazy">귀찮음 (0 = 상쾌, 10 = 모든 게 귀찮음)</label>
+          <input type="range" id="range-lazy" min="0" max="10" value="7" />
+        </div>
+
+        <div class="field">
+          <label for="range-dontwant">하기 싫음 (0 = 할 의욕 있음, 10 = 세상 다 싫음)</label>
+          <input type="range" id="range-dontwant" min="0" max="10" value="6" />
+        </div>
+
+        <button class="btn" id="btn-survey">결과 보기</button>
+
+        <div class="box" id="box-survey">
+          슬라이더를 적당히 움직이고 버튼을 누르면, <br>
+          오늘의 상태를 애매하게 정리해드립니다.
+        </div>
+      </section>
+
+      <!-- 15. 결정 장애 해결기 -->
+      <section id="view-random-chooser" class="view hidden">
+        <a href="#" class="back-link"><span class="icon">←</span> 메뉴로 도망가기</a>
+        <div class="view-title">결정 장애 해결기</div>
+        <div class="view-subtitle">
+          “뭘 먹지?”, “뭐 하지?” 같은 질문을 <br>
+          랜덤에게 외주 주는 시스템.
+        </div>
+
+        <div class="field">
+          <label for="in-random-chooser">선택지 목록 (한 줄에 하나씩)</label>
+          <textarea id="in-random-chooser" placeholder="라면&#10;치킨&#10;피자&#10;그냥 굶기"></textarea>
+        </div>
+
+        <button class="btn" id="btn-random-chooser">골라줘</button>
+
+        <div class="box" id="box-random-chooser">
+          위에 선택지를 적고 버튼을 누르면, <br>
+          이미 네가 마음속으로 골라놨던 걸 랜덤이 골라줄 수도 있음.
+        </div>
+      </section>
+
+      <!-- 16. 오늘 할 일 vs 안 할 일 -->
+      <section id="view-todo-split" class="view hidden">
+        <a href="#" class="back-link"><span class="icon">←</span> 메뉴로 도망가기</a>
+        <div class="view-title">오늘 할 일 vs 안 할 일</div>
+        <div class="view-subtitle">
+          오늘 할 일 목록을 랜덤으로 두 그룹으로 나눠서, <br>
+          책임을 알고리즘에게 떠넘기는 기술.
+        </div>
+
+        <div class="field">
+          <label for="in-todo-split">할 일 목록 (한 줄에 하나씩)</label>
+          <textarea id="in-todo-split" placeholder="국어 숙제&#10;수학 문제집&#10;영어 단어&#10;방 정리"></textarea>
+        </div>
+
+        <button class="btn" id="btn-todo-split">분류하기</button>
+
+        <div class="box" id="box-todo-split">
+          할 일을 쓰고 분류하면, <br>
+          ✅ 오늘 할 일 / ❌ 오늘 안 할 일 로 나눠드립니다.
+        </div>
+
+        <div class="small-text">
+          참고: “오늘 안 할 일”이라고 해서 진짜 안 해도 되는 건 아님.
+        </div>
+      </section>
+
+      <!-- 17. 폰 내려놓기 미션 -->
+      <section id="view-phone-mission" class="view hidden">
+        <a href="#" class="back-link"><span class="icon">←</span> 메뉴로 도망가기</a>
+        <div class="view-title">폰 내려놓기 미션</div>
+        <div class="view-subtitle">
+          폰을 당장은 못 끄더라도, <br>
+          최소한 몇 초 정도는 현실 세계에 접속해보자.
+        </div>
+
+        <button class="btn" id="btn-phone-mission">지금 당장 할 수 있는 미션 뽑기</button>
+
+        <div class="box" id="box-phone-mission">
+          버튼을 누르면, <br>
+          자리에서 바로 할 수 있는 짧은 미션을 하나 드립니다.
+        </div>
+      </section>
+
+      <!-- 18. 쓸데없는 계산기 -->
+      <section id="view-useless-calc" class="view hidden">
+        <a href="#" class="back-link"><span class="icon">←</span> 메뉴로 도망가기</a>
+        <div class="view-title">쓸데없는 계산기</div>
+        <div class="view-subtitle">
+          숫자를 넣으면 정답 대신, <br>
+          아무 의미 없는 분석을 해드립니다.
+        </div>
+
+        <div class="field">
+          <label for="in-useless-num">아무 숫자나 넣어보세요</label>
+          <input id="in-useless-num" type="number" placeholder="예: 42" />
+        </div>
+
+        <button class="btn" id="btn-useless-calc">분석하기</button>
+
+        <div class="box" id="box-useless-calc">
+          숫자를 하나 넣고 버튼을 누르면, <br>
+          진지한 척하는 이상한 분석이 나옵니다.
+        </div>
+      </section>
+
+      <!-- 19. 인터넷 연결 안 됨 시뮬레이터 -->
+      <section id="view-fake-offline" class="view hidden">
+        <a href="#" class="back-link"><span class="icon">←</span> 메뉴로 도망가기</a>
+        <div class="view-title">인터넷 연결 안 됨 시뮬레이터</div>
+        <div class="view-subtitle">
+          실제로는 잘 되는데, <br>
+          그냥 “안 되는 척” 하는 화면.
+        </div>
+
+        <div class="box" id="box-offline">
+          <strong>인터넷 연결 없음</strong><br><br>
+          이 페이지는 네가 공부나 다른 일을 하도록 돕기 위해 <br>
+          인터넷이 끊긴 척 하고 있습니다.<br><br>
+          사실은 잘 연결되어 있을 가능성이 매우 높습니다.
+        </div>
+
+        <button class="btn btn-ghost" id="btn-offline">문제 진단하기</button>
+
+        <div class="small-text">
+          진짜로 인터넷이 끊긴 게 아니라면, <br>
+          지금 이 페이지를 보고 있다는 사실 자체가 증거임.
+        </div>
+      </section>
+    </main>
+
+    <!-- 아래 고정 푸터 -->
+    <footer class="app-footer">
+      made by zzapcho
+    </footer>
   </div>
 
   <script>
@@ -855,14 +877,15 @@
       document.querySelectorAll(".view").forEach(v => v.classList.add("hidden"));
       const target = document.getElementById(id);
       if (target) target.classList.remove("hidden");
-      // 페이지 맨 위로
-      window.scrollTo({ top: 0, behavior: "auto" });
+
+      const main = document.querySelector(".app-main");
+      if (main) main.scrollTo({ top: 0, behavior: "auto" });
     }
 
     window.addEventListener("hashchange", () => showView(location.hash));
     window.addEventListener("load", () => showView(location.hash));
 
-    // ====== 각 앱 로직 ======
+    // ====== 기존 병맛 앱 로직 ======
 
     // 1) 아무것도 안 함
     (function initNothing() {
